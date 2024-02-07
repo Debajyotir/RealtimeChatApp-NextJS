@@ -4,9 +4,9 @@ import { db } from "./db";
 import GoogleProvider from "next-auth/providers/google"
 import { fetchRedis } from "@/helper/redis";
 
-const getGoogleCredentials = () =>{
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const getGoogleCredentials = () => {
+    const clientId = process.env.GOOGLE_CLIENT_ID !;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET !;
     
     // console.log(clientId);
     // console.log(clientSecret);
