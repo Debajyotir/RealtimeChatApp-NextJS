@@ -50,7 +50,9 @@ export async function POST(req:Request) {
             }
         )
 
-        db.sadd(`user:${idToAdd}:incoming_friend_requests`,sessions.user.id);
+        await pusherServer.trigger(toPusherKey(`user:${idToAdd}:cnt`),"cnt",{});
+
+        await db.sadd(`user:${idToAdd}:incoming_friend_requests`,sessions.user.id);
 
         return new Response("Ok",{status:200});
 

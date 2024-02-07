@@ -1,6 +1,8 @@
 import { fetchRedis } from "@/helper/redis";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { pusherServer } from "@/lib/pusher";
+import { toPusherKey } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { z } from "zod"
 
@@ -30,7 +32,11 @@ export async function POST(req:Request){
             return new Response("You Can't Add or remove yourself as friend",{status:400});
         }
 
-        db.srem(`user:${session.user.id}:incoming_friend_requests`, idToDeny);
+
+        await Promise.all([
+            pusherServer.trigger(toPusherKey(`user:${session.user.id}:denyfriends`),"deny_friend",{}),
+            db.srem(`user:${session.user.id}:incoming_friend_requests`, idToDeny)
+        ])
 
         return new Response("OK");
     } catch (error) {

@@ -14,9 +14,11 @@ const FriendRequestsSideBarOptions: FC<FriendRequestsSideBarOptionsProps> = ({in
     const[unSeenRequestCount,setUnSeenRequestCount] = useState(initialUnSeenRequestCount);
 
     useEffect(()=>{
-        pusherClient.subscribe(toPusherKey(`user:${sessionId}:incoming_friend_request`));
+        pusherClient.subscribe(toPusherKey(`user:${sessionId}:cnt`));
 
-        pusherClient.subscribe(toPusherKey(`user:${sessionId}:friends`))
+        pusherClient.subscribe(toPusherKey(`user:${sessionId}:addfriends`));
+
+        pusherClient.subscribe(toPusherKey(`user:${sessionId}:denyfriends`));
 
         const friendRequestHandler = () =>{
             setUnSeenRequestCount((prev)=>prev+1)
@@ -27,19 +29,25 @@ const FriendRequestsSideBarOptions: FC<FriendRequestsSideBarOptionsProps> = ({in
             setUnSeenRequestCount((prev)=>prev-1);
         }
 
-        pusherClient.bind("incoming_friend_requests",friendRequestHandler);
+        pusherClient.bind("cnt",friendRequestHandler);
         
-        pusherClient.bind("new_friend",addedFriendHandler);
+        pusherClient.bind("add_friend",addedFriendHandler);
+
+        pusherClient.bind("deny_friend",addedFriendHandler);
 
         return ()=>{
-            pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:incoming_friend_request`));
-            pusherClient.unbind("incoming_friend_requests",friendRequestHandler);
+            pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:cnt`));
+            pusherClient.unbind("cnt",friendRequestHandler);
 
-            pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:friends`));
-            pusherClient.unbind("new_friend",addedFriendHandler);
+            pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:addfriends`));
+            pusherClient.unbind("add_friend",addedFriendHandler);
+
+            pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:denyfriends`));
+            pusherClient.unbind("deny_friend",addedFriendHandler);
         }
     },[sessionId])
 
+    
   return(
     <Link href={"/dashboard/requests"} className='text-gray-700 hover:text-indigo-600 hover:bg-gray-50 group flex items-center gap-x-3
     rounded-md p-2 text-sm leading-6 font-semibold'>
